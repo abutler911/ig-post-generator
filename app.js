@@ -12,8 +12,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-const prompt = "Write a short and engaging Instagram post about summer.";
-
 app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
@@ -22,20 +20,16 @@ app.get("/", (req, res) => {
 
 app.post("/generate", async (req, res) => {
   const prompt = req.body.prompt;
-
-  // Interpret 'num_words' as 'max_tokens'
   let max_tokens = parseInt(req.body.num_words) || 200;
 
-  // Interpret 'randomness' as 'temperature'
   let temperature = parseFloat(req.body.randomness) || 0;
 
-  // Check if values are valid
   if (max_tokens <= 0) {
-    max_tokens = 200; // set to default
+    max_tokens = 200;
   }
 
   if (temperature < 0 || temperature > 1) {
-    temperature = 0; // set to default
+    temperature = 0;
   }
 
   try {
