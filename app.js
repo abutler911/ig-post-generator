@@ -20,28 +20,49 @@ app.get("/", (req, res) => {
 
 app.post("/generate", async (req, res) => {
   const prompt = req.body.prompt;
-  let max_tokens = parseInt(req.body.num_words) || 200;
+  let num_words = parseInt(req.body.num_words) || 40;
+  let randomness = parseFloat(req.body.randomness) || 0;
+  let hashtags = req.body.hashtags || "";
 
-  let temperature = parseFloat(req.body.randomness) || 0;
+  // Convert user's desired number of words to an approximate number of tokens.
+  let max_tokens = num_words * 5;
 
   if (max_tokens <= 0) {
-    max_tokens = 200;
+    max_tokens = 200; // set to default
   }
 
-  if (temperature < 0 || temperature > 1) {
-    temperature = 0;
+  if (randomness < 0 || randomness > 1) {
+    randomness = 0; // set to default
   }
 
   try {
+    const promptWithHashtags = `${prompt}\n${hashtags}`;
+
     const response = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: prompt,
-      temperature: temperature,
+      prompt: promptWithHashtags,
+      temperature: randomness,
       max_tokens: max_tokens,
+      top_p: randomness,
+      presence_penalty: 0,
+      frequency_penalty: 0,
     });
 
+    let generatedText = response.data.choices[0].text.trim();
+
+    // Convert the text into an array of words.
+    let words = generatedText.split(/\s+/);
+
+    // Trim the words array to the user-specified length.
+    if (words.length > num_words) {
+      words = words.slice(0, num_words);
+      generatedText = words.join(" ");
+    }
+
+    generatedText = `${generatedText}\n${hashtags}`;
+
     res.render("index", {
-      generatedText: response.data.choices[0].text.trim(),
+      generatedText: generatedText,
     });
   } catch (error) {
     console.error(error);
