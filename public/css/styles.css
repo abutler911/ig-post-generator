@@ -98,19 +98,3 @@ fieldset {
     text-align: justify;
     padding: 10px;
 }
-
-footer {
-    background-color: #F3CCFF;
-
-    color: #000;
-    text-align: center;
-    padding: 20px 0;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-}
-
-footer p {
-    margin: 0;
-    font-size: 0.875rem;
-}
